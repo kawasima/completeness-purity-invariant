@@ -39,3 +39,7 @@
 ここで、外部のサービスを使って「郵便番号、住所が実在するものでなくてはならない」というビジネスルールを加えたとしよう。
 これは、注文集約の外に依存するので、前述の完全性と純粋性が両立できないケースになる。このとき、どう実装したらよいだろうか?
 
+完全性と純粋性が同時に満たせないとき、純粋性を守りにいくケースをよく見かけるし、[この記事](https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/) でもそれが推奨されている。
+完全性が失われるデメリットの1つに、アプリケーションレイヤーでのビジネスルールのチェック漏れの懸念があるが、これはビジネスルールを満たすかチェック済みの型を分けることで防ぐことができる。
+(実装: [Order](src/main/java/net/unit8/example/invariant/incompleteness/Order.java) / [App](src/main/java/net/unit8/example/invariant/incompleteness/DeliverOrderHandlerImpl.java)
+

@@ -5,6 +5,6 @@ import lombok.Value;
 @Value
 public class DeliveredOrderEvent {
     OrderId orderId;
-    Address address;
+    IAddress address;
     DeliveryTime deliveryTime;
 }

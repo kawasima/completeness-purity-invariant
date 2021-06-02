@@ -10,7 +10,7 @@ import lombok.Value;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Address {
+public class Address implements IAddress {
     private final static Validator<Address> validator = ValidatorBuilder.<Address>of()
             .constraint(Address::getCountry, "country", c -> c.notBlank()
                     .lessThanOrEqual(2))
