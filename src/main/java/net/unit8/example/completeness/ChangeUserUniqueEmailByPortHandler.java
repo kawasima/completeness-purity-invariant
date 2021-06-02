@@ -27,7 +27,7 @@ public class ChangeUserUniqueEmailByPortHandler {
     }
 
 
-    public Result<ChangeUserEmailHandler.ChangedUserEmailEvent> changeEmail(ChangeUserEmailHandler.ChangeUserEmailCommand command) {
+    public Result<ChangedUserEmailEvent> changeEmail(ChangeUserEmailCommand command) {
         User user = loadUserPort.load(command.getUserId()).orElseThrow();
         String oldEmail = user.getEmail();
 
@@ -37,7 +37,7 @@ public class ChangeUserUniqueEmailByPortHandler {
         }
         saveUserPort.save(user);
 
-        return Result.ok(new ChangeUserEmailHandler.ChangedUserEmailEvent(
+        return Result.ok(new ChangedUserEmailEvent(
                 command.getUserId(),
                 oldEmail,
                 command.getNewEmail()

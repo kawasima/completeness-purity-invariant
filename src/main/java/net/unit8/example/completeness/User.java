@@ -1,16 +1,18 @@
 package net.unit8.example.completeness;
 
 import io.fries.result.Result;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 
+@AllArgsConstructor
 public class User {
     @Getter
-    Company company;
+    private final Company company;
 
     @Getter
-    String email;
+    private String email;
 
     public Result<User> changeEmail(String newEmail) {
         if (!company.isEmailCorporate(newEmail)) {

@@ -27,7 +27,7 @@ public class ChangeUserUniqueEmailHandler {
     }
 
 
-    public Result<ChangeUserEmailHandler.ChangedUserEmailEvent> changeEmail(ChangeUserEmailHandler.ChangeUserEmailCommand command) {
+    public Result<ChangedUserEmailEvent> changeEmail(ChangeUserEmailCommand command) {
         if (existsEmailPort.exists(command.getNewEmail())) {
             return Result.error(new EmailAlreadyTakenException(command.getNewEmail()));
         }
@@ -40,7 +40,7 @@ public class ChangeUserUniqueEmailHandler {
         }
         saveUserPort.save(user);
 
-        return Result.ok(new ChangeUserEmailHandler.ChangedUserEmailEvent(
+        return Result.ok(new ChangedUserEmailEvent(
                 command.getUserId(),
                 oldEmail,
                 command.getNewEmail()

@@ -6,7 +6,7 @@ public class Company {
     @Getter
     private final String corporateDomain;
 
-    private Company(String domain) {
+    public Company(String domain) {
         this.corporateDomain = domain;
     }
 
