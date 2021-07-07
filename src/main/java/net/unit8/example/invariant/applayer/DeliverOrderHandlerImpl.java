@@ -9,6 +9,8 @@ import lombok.Value;
 import net.unit8.example.invariant.share.*;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 
 import static net.unit8.example.invariant.share.OrderConstraint.DELIVERY_WEEKDAY;
@@ -64,8 +66,9 @@ public class DeliverOrderHandlerImpl implements DeliverOrderHandler {
         final Order order = loadOrderPort.load(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
-        Validated<Address> addressValidated = Address.of(command.getCountry(), command.getPostalCode(), command.getRegion(), command.getLocality(), command.getStreetAddress());
-        Validated<DeliveryTime> deliveryTimeValidated = DeliveryTime.of(command.getDeliveryTime());
+        Validated<Address> addressValidated = Address.validator().validate(command.getCountry(), command.getPostalCode(), command.getRegion(), command.getLocality(), command.getStreetAddress());
+        Validated<DeliveryTime> deliveryTimeValidated = DeliveryTime.validator()
+                .validate(LocalDateTime.parse(command.getDeliveryTime(), DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")));
         Validated<DeliveryInformation> deliveryValidated = Validations.combine(addressValidated, deliveryTimeValidated)
                 .apply(DeliveryInformation::new);
 

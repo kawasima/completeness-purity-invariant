@@ -11,7 +11,8 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <spring-boot.version>2.5.0</spring-boot.version>
+        <spring-boot.version>2.5.2</spring-boot.version>
+        <yavi.version>0.8.2</yavi.version>
     </properties>
 
     <build>
@@ -33,7 +34,7 @@
         <dependency>
             <groupId>am.ik.yavi</groupId>
             <artifactId>yavi</artifactId>
-            <version>0.6.1</version>
+            <version>${yavi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

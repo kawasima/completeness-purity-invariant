@@ -7,6 +7,8 @@ import io.fries.result.Result;
 import net.unit8.example.invariant.share.*;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +28,9 @@ public class DeliverOrderHandlerImpl implements DeliverOrderHandler {
         final Order order = loadOrderPort.load(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
-        Validated<Address> addressValidated = Address.of(command.getCountry(), command.getPostalCode(), command.getRegion(), command.getLocality(), command.getStreetAddress());
-        Validated<DeliveryTime> deliveryTimeValidated = DeliveryTime.of(command.getDeliveryTime());
+        Validated<Address> addressValidated = Address.validator().validate(command.getCountry(), command.getPostalCode(), command.getRegion(), command.getLocality(), command.getStreetAddress());
+        Validated<DeliveryTime> deliveryTimeValidated = DeliveryTime.validator()
+                .validate(LocalDateTime.parse(command.getDeliveryTime(), DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")));
 
         // 注文を配送状態にし、永続化する。
         // deliverの中で、ビジネスルールがチェックされる。

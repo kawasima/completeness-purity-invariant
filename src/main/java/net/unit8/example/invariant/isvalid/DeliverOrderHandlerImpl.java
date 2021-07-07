@@ -6,6 +6,9 @@ import io.fries.result.Result;
 import net.unit8.example.invariant.share.*;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Component
 public class DeliverOrderHandlerImpl implements DeliverOrderHandler {
     private final LoadOrderPort loadOrderPort;
@@ -23,22 +26,28 @@ public class DeliverOrderHandlerImpl implements DeliverOrderHandler {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
         ConstraintViolations violations = new ConstraintViolations();
-        Validated<Address> addressValidated = Address.of(command.getCountry(), command.getPostalCode(), command.getRegion(), command.getLocality(), command.getStreetAddress());
+        Validated<Address> addressValidated = Address.validator().validate(command.getCountry(), command.getPostalCode(), command.getRegion(), command.getLocality(), command.getStreetAddress());
         if (addressValidated.isValid()) {
             order.setDeliverAddress(addressValidated.value());
         } else {
             violations.addAll(addressValidated.errors());
         }
 
-        Validated<DeliveryTime> deliveryTimeValidated = DeliveryTime.of(command.getDeliveryTime());
+        Validated<DeliveryTime> deliveryTimeValidated = DeliveryTime.validator()
+                .<DeliverOrderCommand>compose(c -> LocalDateTime.parse(c.getDeliveryTime(), DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
+                .validate(command);
+
         if (deliveryTimeValidated.isValid()) {
             order.setDeliveryTime(deliveryTimeValidated.value());
         } else {
             violations.addAll(deliveryTimeValidated.errors());
         }
 
-        ConstraintViolations orderViolations = order.validateForDelivery();
-        violations.addAll(orderViolations);
+        if (violations.isEmpty()) {
+            ConstraintViolations orderViolations = order.validateForDelivery();
+            violations.addAll(orderViolations);
+        }
+
         if (!violations.isEmpty()) {
             return Result.error(new OrderDeliveryException(violations));
         }

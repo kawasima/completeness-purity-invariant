@@ -1,5 +1,9 @@
 package net.unit8.example.invariant.incompleteness;
 
+import am.ik.yavi.arguments.Arguments;
+import am.ik.yavi.arguments.Arguments1Validator;
+import am.ik.yavi.arguments.ArgumentsValidators;
+import am.ik.yavi.builder.ArgumentsValidatorBuilder;
 import am.ik.yavi.core.ConstraintViolation;
 import am.ik.yavi.core.Validated;
 import am.ik.yavi.fn.Validations;
@@ -7,6 +11,8 @@ import io.fries.result.Result;
 import net.unit8.example.invariant.incompleteness.address.ExistingAddress;
 import net.unit8.example.invariant.share.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +33,14 @@ public class DeliverOrderHandlerImpl implements DeliverOrderHandler {
         final Order order = loadOrderPort.load(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
 
-        Validated<Address> addressValidated = Address.of(command.getCountry(), command.getPostalCode(), command.getRegion(), command.getLocality(), command.getStreetAddress());
-        Validated<DeliveryTime> deliveryTimeValidated = DeliveryTime.of(command.getDeliveryTime());
+        Validated<Address> addressValidated = Address.validator()
+                .<DeliverOrderCommand>compose(c -> Arguments.of(c.getCountry(), c.getPostalCode(), c.getRegion(), c.getLocality(), c.getStreetAddress()))
+                .validate(command);
+
+        Validated<DeliveryTime> deliveryTimeValidated = DeliveryTime.validator()
+                .<DeliverOrderCommand>compose(c -> LocalDateTime.parse(c.getDeliveryTime(), DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
+                .validate(command);
+
 
         // 注文を配送状態にし、永続化する。
         // deliverの中で、ビジネスルールがチェックされる。
